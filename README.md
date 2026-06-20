@@ -61,11 +61,11 @@ When run with no arguments, MyUtils picks a folder to scan in this order:
  
 ## How it works
  
-On startup, MyUtils resolves the folder to scan (see resolution order above), then walks it and every subfolder looking for files ending in `.exe`, `.bat`, `.cmd`, or `.ps1`. It builds one menu per file type found — empty categories are skipped entirely, and if nothing turns up at all, the main menu just shows **"No utilities loaded"**.
+At startup, MyUtils resolves which folder to scan (see resolution order above), then walks that folder and all subfolders looking for files ending in `.exe`, `.bat`, `.cmd`, or `.ps1`. It creates a menu for each file type it finds, leaving out completely any empty categories and if nothing appears at all, the main menu simply displays **"No utilities loaded"**.
  
-Selecting a file launches it in the same console window; once it exits, MyUtils redraws and you're back at the menu.
+If you select a file, it opens in the current console window, and when it ends, MyUtils redraws and you’re back at the menu.
  
-A small per-user config file at `%APPDATA%\MyUtils\config.json` stores the saved default folder (if you set one with `-dir set`). This location is used specifically because it survives `winget upgrade` — the folder winget actually installs the executable into is replaced on every upgrade, so nothing should be saved there.
+The saved default folder (if you have set one with `-dir set`) is saved in a small per-user config file in `%APPDATA%\MyUtils\config.json`. This location is used specifically because it survives `winget upgrade` - the folder that winget actually installs the executable into is replaced on every upgrade so nothing should be saved there.
  
 ## Building from source
  
