@@ -153,9 +153,16 @@
     <ClInclude Include="FilePopulate.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="myutils.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="myutils.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
