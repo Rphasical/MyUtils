@@ -1,4 +1,6 @@
 # MyUtils
+An easy utility manager for you lazy efficient folk.
+
 Your easy utiltiy manager for, .cmd, .bat, .ps1, and .exe files with more automation lists to come. We all hate that feeling of scrolling through folders looking for a script or running tree 3000 times on linux. Here, there's no worry, just plop your supported filetypes in the same folder directory and bam you're done.
 
 ## Features
