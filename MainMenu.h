@@ -8,7 +8,7 @@ namespace myutils
     class MainMenu
     {
     public:
-        void run();
+        void run(const std::wstring& scanDir = L"");
 
     private:
         struct Category
@@ -22,11 +22,11 @@ namespace myutils
         {
             std::wstring              heading;
             std::vector<std::wstring> labels;       
-            std::vector<std::wstring> statuses;    
-            std::wstring              pinnedLabel;   
+            std::vector<std::wstring> statuses;     
+            std::wstring              pinnedLabel; 
             std::wstring              pinnedStatus;
-            bool                      emptyAllowed = false;
-            std::wstring              placeholder;       
+            bool                      emptyAllowed = false; 
+            std::wstring              placeholder;     
         };
 
         FilePopulate          m_fp;
@@ -34,7 +34,7 @@ namespace myutils
         std::vector<Category> m_categories;
 
         void buildCategories();
-        void drawChrome();                     
+        void drawChrome();                        
         std::vector<std::wstring> buildBanner() const;
 
         int  runView(const ViewSpec& v);

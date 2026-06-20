@@ -6,12 +6,12 @@ namespace myutils
     using namespace ui;
 
     namespace {
-        constexpr int ITEM_X = 4; 
+        constexpr int ITEM_X = 4;   
         constexpr int ITEM_W = 72;  
         constexpr int ITEMS_Y = 11; 
         constexpr int VISIBLE = 8;   
         constexpr int HEAD_Y = 9;   
-        constexpr int QUIT_Y = 20;
+        constexpr int QUIT_Y = 20;  
         constexpr int STATUS_Y = 22;  
 
         constexpr wchar_t TL = L'\u2554', TR = L'\u2557', BL = L'\u255A', BR = L'\u255D';
@@ -24,7 +24,7 @@ namespace myutils
             { "#####", "  #  ", "  #  ", "  #  ", "  #  " }, // T
             { "#####", "  #  ", "  #  ", "  #  ", "#####" }, // I
             { "#    ", "#    ", "#    ", "#    ", "#####" }, // L
-            { "#####", "#    ", "#####", "    #", "#####" }, // S   God bless ASCII Glyph calculators
+            { "#####", "#    ", "#####", "    #", "#####" }, // S   Thank god for ASCII calculators
         };
 
         void borderLine(int y, wchar_t left, wchar_t mid, wchar_t right)
@@ -62,7 +62,6 @@ namespace myutils
 
         struct Def { FileType t; const wchar_t* label; };
         const Def defs[] = {
-            // clean lineup for a clean utiltiy manager
             { FileType::Exe, L"Executables       (.exe)" },
             { FileType::Bat, L"Batch Scripts     (.bat)" },
             { FileType::Cmd, L"Command Scripts   (.cmd)" },
@@ -105,7 +104,7 @@ namespace myutils
 
         const std::wstring credit = L"by Ray Bunton 2026";
         putString(SCREEN_W - 2 - (int)credit.size(), 6, credit, ACCENT);
-        putString(4, 7, L"- Utility Launcher  @_@ -", DIM);
+        putString(4, 7, L"- Utility Launcher -", DIM);
 
         const std::wstring help =
             L"[\u2191\u2193] Move     [Enter/Space] Select     [Esc] Back / Quit";
@@ -115,7 +114,7 @@ namespace myutils
     int MainMenu::runView(const ViewSpec& v)
     {
         const int n = (int)v.labels.size();
-        const int total = n + 1;
+        const int total = n + 1; 
         int sel = 0;
         int top = 0;
 
@@ -154,15 +153,18 @@ namespace myutils
                             + fit(v.labels[idx], ITEM_W - 4);
                         putBar(ITEM_X, ITEMS_Y + r, ITEM_W, lab, s ? SELECTED : TEXT, 1);
                     }
+                    // Scroll hints.
                     if (top > 0)
                         putString(ITEM_X + ITEM_W + 1, ITEMS_Y, L"\u25B2", ACCENT);
                     if (top + VISIBLE < n)
                         putString(ITEM_X + ITEM_W + 1, ITEMS_Y + VISIBLE - 1, L"\u25BC", ACCENT);
                 }
 
+                // Pinned bottom bar (QUIT / BACK), highlighted when selected.
                 const bool pinSel = (sel == n);
                 putBarCentered(2, QUIT_Y, SCREEN_W - 4, v.pinnedLabel, pinSel ? SELECTED : BARBG);
 
+                // Detail line.
                 clearRow(STATUS_Y);
                 std::wstring st = pinSel ? v.pinnedStatus : (n > 0 ? v.statuses[sel] : L"");
                 putString(ITEM_X, STATUS_Y, fit(st, ITEM_W), TEXT);
@@ -179,18 +181,18 @@ namespace myutils
                 int a = _getch();
                 if (a == 72) { sel = (sel - 1 + total) % total;       fixScroll(); draw(); } 
                 else if (a == 80) { sel = (sel + 1) % total;               fixScroll(); draw(); } 
-                else if (a == 75) { return -1; }                                                
+                else if (a == 75) { return -1; }                                                 
                 else if (a == 77) { return sel; }                                                 
                 else if (a == 71) { sel = 0;                               fixScroll(); draw(); } 
                 else if (a == 79) { sel = total - 1;                       fixScroll(); draw(); } 
                 else if (a == 73) { sel = std::max(0, sel - VISIBLE);      fixScroll(); draw(); } 
-                else if (a == 81) { sel = std::min(total - 1, sel + VISIBLE); fixScroll(); draw(); } 
+                else if (a == 81) { sel = std::min(total - 1, sel + VISIBLE); fixScroll(); draw(); }
             }
             else
             {
-                if (k == 13 || k == 32)     return sel;
-                if (k == 27)                return -1;  
-                if (k == 'q' || k == 'Q')   return -1;  
+                if (k == 13 || k == 32)     return sel; 
+                if (k == 27)                return -1; 
+                if (k == 'q' || k == 'Q')   return -1;
             }
         }
     }
@@ -214,10 +216,10 @@ namespace myutils
 
             const int choice = runView(v);
             if (choice < 0 || choice == (int)v.labels.size())
-                return;
+                return; 
 
             launch(*cat.files[choice]);
-            drawChrome();
+            drawChrome(); 
         }
     }
 
@@ -251,12 +253,19 @@ namespace myutils
         hideCursor();
     }
 
-    void MainMenu::run()
+    void MainMenu::run(const std::wstring& scanDir)
     {
         init();
 
         const std::wstring self = FilePopulate::exePath();
-        const std::wstring root = FilePopulate::exeDirectory();
+
+        std::wstring root = scanDir;
+        if (root.empty())
+        {
+            std::error_code ec;
+            std::filesystem::path cwd = std::filesystem::current_path(ec);
+            root = ec ? FilePopulate::exeDirectory() : cwd.wstring();
+        }
 
         m_files = m_fp.scan(root, self);
         buildCategories();
@@ -265,13 +274,14 @@ namespace myutils
 
         for (;;)
         {
-            // claude wrote this part if its cooked please lmk.
             ViewSpec v;
-            v.heading = L"MAIN MENU";
+            v.heading = L"MAIN MENU      Scanning: " + root;
             v.pinnedLabel = L"QUIT";
             v.pinnedStatus = L"Exit MYUTILS";
             v.emptyAllowed = true;
-            v.placeholder = L"No utilities loaded";
+            v.placeholder = m_categories.empty()
+                ? L"No utilities loaded  -  nothing runnable in: " + root
+                : L"No utilities loaded";
 
             for (const auto& c : m_categories)
             {
@@ -286,6 +296,7 @@ namespace myutils
 
             runCategory(m_categories[choice]);
         }
+
 
         showCursor();
         clear(NORMAL);

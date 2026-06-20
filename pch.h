@@ -13,4 +13,6 @@
 #include <algorithm>
 #include <cwctype>
 #include <filesystem>
+#include <fstream>
+#include <iterator>
 #include <cstdlib>
