@@ -13,7 +13,10 @@ Your easy utiltiy manager for, .cmd, .bat, .ps1, and .exe files with more automa
 
 ### Manual download
  
-Grab the latest `myutils.exe` from the [Releases](../../releases) page. It's a single portable executable - no installation required, just run it.
+Grab the latest `myutils.exe` from the [Releases](../../releases) page. It's a single portable executable - no installation required.
+
+**You must link the folder you dowload the .exe in to PATH**
+**Searh chagne environment variables in the searchbar, click it, and then click on path and add your folder containing myutils.exe**
 
 **Note:** This binary is not code-signed. Windows SmartScreen may show an "Unknown Publisher" warning the first time you run it - this is expected for an unsigned indie tool. Click **More info → Run anyway** to proceed. You can verify the download against the SHA-256 checksum published with each release.
 
