@@ -17,6 +17,9 @@ namespace myutils
 
             SMALL_RECT rect = { 0, 0, (SHORT)(w - 1), (SHORT)(h - 1) };
             SetConsoleWindowInfo(g_out, TRUE, &rect);
+
+            // Pin the buffer to the window so nothing scrolls off and bleeds back lie kthe yucky terminal column lines.
+            SetConsoleScreenBufferSize(g_out, buf);
         }
 
         void init()
@@ -29,7 +32,40 @@ namespace myutils
                 SetConsoleMode(g_out, mode & ~ENABLE_WRAP_AT_EOL_OUTPUT);
 
             setSize(SCREEN_W, SCREEN_H);
+            fullClear(BG);
             hideCursor();
+        }
+
+        void applySize()
+        {
+            setSize(SCREEN_W, SCREEN_H);
+        }
+
+        int readKey()
+        {
+            static int lastW = -1, lastH = -1;
+            if (lastW < 0) getSize(lastW, lastH);
+
+            for (;;)
+            {
+                if (_kbhit())
+                {
+                    int k = _getch();
+                    if (k == 0 || k == 224) return KEY_EXT | _getch();
+                    return k;
+                }
+
+                int w = 0, h = 0;
+                getSize(w, h);
+                if (w != lastW || h != lastH)
+                {
+                    lastW = w;
+                    lastH = h;
+                    return KEY_RESIZE;
+                }
+
+                Sleep(30);
+            }
         }
 
         void hideCursor()
@@ -82,6 +118,30 @@ namespace myutils
             // easiest way to do this, stack overflow I love you.
             FillConsoleOutputCharacterW(g_out, L' ', SCREEN_W, at, &written);
             FillConsoleOutputAttribute(g_out, attr, SCREEN_W, at, &written);
+        }
+
+        void getSize(int& w, int& h)
+        {
+            CONSOLE_SCREEN_BUFFER_INFO csbi;
+            if (!GetConsoleScreenBufferInfo(g_out, &csbi)) { w = SCREEN_W; h = SCREEN_H; return; }
+            w = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+            h = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+        }
+
+        // Wipes the ENTIRE buffer, not just the visible window, so old child-process
+        // output scrolled off-screen can't bleed back in when we redraw with that stupid lingering powershell.
+        void fullClear(WORD attr)
+        {
+            CONSOLE_SCREEN_BUFFER_INFO csbi;
+            if (!GetConsoleScreenBufferInfo(g_out, &csbi)) return;
+
+            DWORD cells = (DWORD)csbi.dwSize.X * (DWORD)csbi.dwSize.Y;
+            COORD home = { 0, 0 };
+            DWORD written = 0;
+
+            FillConsoleOutputCharacterW(g_out, L' ', cells, home, &written);
+            FillConsoleOutputAttribute(g_out, attr, cells, home, &written);
+            gotoxy(0, 0);
         }
 
         void putString(int x, int y, const std::wstring& s, WORD attr)
