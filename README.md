@@ -11,6 +11,10 @@ Your easy utiltiy manager for, .cmd, .bat, .ps1, and .exe files with more automa
 - **Single static binary** - no installer, no .NET/VC++ Redistributable dependency, no DLLs to ship alongside it.
 - **Persistent default folder** - set a default scan directory once, then just run `myutils` from anywhere.
 
+### Winget download
+winget install Rphasical.MyUtils
+
+
 ### Manual download
  
 Grab the latest `myutils.exe` from the [Releases](../../releases) page. It's a single portable executable - no installation required.
